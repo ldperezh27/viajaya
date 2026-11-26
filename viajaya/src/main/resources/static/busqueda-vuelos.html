@@ -1,147 +1,358 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ViajaYa — Buscar vuelos</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="viajaya-vuelos.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #14231a;
+      --muted: #3d5346;
+      --paper: #f3efe6;
+      --panel: rgba(255, 252, 246, 0.92);
+      --accent: #0f6b4c;
+      --accent-deep: #0a4a35;
+      --line: rgba(20, 35, 26, 0.14);
+      --danger: #8a2a1b;
+      --shadow: 0 18px 50px rgba(20, 35, 26, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Source Sans 3", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #d8efe4 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #f0e0c8 0%, transparent 50%),
+        linear-gradient(160deg, #efe8da 0%, #e7f0ea 45%, #dfe9e3 100%);
+    }
+
+    main {
+      width: min(920px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 3.5rem 0 4rem;
+    }
+
+    .brand {
+      font-family: Fraunces, serif;
+      font-size: clamp(2.4rem, 6vw, 3.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin: 0 0 0.35rem;
+      animation: rise 700ms ease both;
+    }
+
+    .lede {
+      margin: 0 0 2rem;
+      max-width: 34rem;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.45;
+      animation: rise 700ms ease 80ms both;
+    }
+
+    form {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 1.35rem;
+      display: grid;
+      gap: 0.9rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      animation: rise 700ms ease 140ms both;
+    }
+
+    label {
+      display: grid;
+      gap: 0.35rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    label.full { grid-column: 1 / -1; }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      padding: 0.75rem 0.85rem;
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 107, 76, 0.16);
+    }
+
+    .actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 0.25rem;
+    }
+
+    button {
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      padding: 0.8rem 1.25rem;
+      cursor: pointer;
+      transition: transform 160ms ease, background 160ms ease;
+    }
+
+    button:hover { background: var(--accent-deep); }
+    button:active { transform: translateY(1px); }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    #feedback {
+      margin-top: 1.25rem;
+      min-height: 1.5rem;
+      font-size: 0.98rem;
+      animation: rise 500ms ease both;
+    }
+
+    #feedback.error { color: var(--danger); font-weight: 600; }
+    #feedback.info { color: var(--muted); }
+
+    #resultados {
+      margin-top: 1rem;
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    article {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 1rem 1.1rem;
+      display: grid;
+      gap: 0.35rem;
+      animation: rise 500ms ease both;
+    }
+
+    article h2 {
+      margin: 0;
+      font-family: Fraunces, serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    article p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    article .precio {
+      color: var(--accent-deep);
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    article .acciones {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    article .btn-detalle {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border: 1px solid rgba(15, 107, 76, 0.35);
+      color: var(--accent-deep);
+      background: transparent;
+      font: inherit;
+      font-weight: 600;
+      padding: 0.55rem 0.95rem;
+    }
+
+    article .btn-detalle:hover {
+      background: rgba(15, 107, 76, 0.08);
+    }
+
+    @media (max-width: 700px) {
+      form { grid-template-columns: 1fr; }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-  <div class="page">
-    <header class="brand-bar">
-      <a class="brand" href="busqueda-vuelos.html">ViajaYa</a>
-      <p class="brand-tag">Busca y compara tu próximo vuelo</p>
-    </header>
+  <main>
+    <p class="brand">ViajaYa</p>
+    <p class="lede">Busca vuelos por origen, destino, fecha de salida y pasajeros.</p>
 
-    <main>
-      <section class="panel" aria-labelledby="titulo-busqueda">
-        <h1 id="titulo-busqueda">Buscar vuelos</h1>
-        <form id="form-busqueda" class="search-form">
-          <label>
-            Origen
-            <input id="origen" name="origen" type="text" required placeholder="Bogotá" autocomplete="off">
-          </label>
-          <label>
-            Destino
-            <input id="destino" name="destino" type="text" required placeholder="Medellín" autocomplete="off">
-          </label>
-          <label>
-            Fecha de salida
-            <input id="fechaSalida" name="fechaSalida" type="date" required>
-          </label>
-          <label>
-            Pasajeros
-            <input id="pasajeros" name="pasajeros" type="number" min="1" value="1" required>
-          </label>
-          <button type="submit">Buscar</button>
-        </form>
-      </section>
+    <form id="form-busqueda" novalidate>
+      <label>
+        Origen
+        <input id="origen" name="origen" type="text" required placeholder="Bogota" autocomplete="off" />
+      </label>
+      <label>
+        Destino
+        <input id="destino" name="destino" type="text" required placeholder="Medellin" autocomplete="off" />
+      </label>
+      <label>
+        Fecha de salida
+        <input id="fechaSalida" name="fechaSalida" type="date" required />
+      </label>
+      <label>
+        Pasajeros
+        <input id="pasajeros" name="pasajeros" type="number" min="1" step="1" value="1" required />
+      </label>
+      <div class="actions">
+        <button type="submit">Buscar vuelos</button>
+        <span class="hint">PVY-9 · consulta contra /api/vuelos/buscar</span>
+      </div>
+    </form>
 
-      <section class="panel results" aria-live="polite">
-        <h2>Resultados</h2>
-        <p id="mensaje" class="mensaje" hidden></p>
-        <ul id="lista-resultados" class="flight-list"></ul>
-      </section>
-    </main>
-  </div>
+    <div id="feedback" aria-live="polite"></div>
+    <section id="resultados" aria-live="polite"></section>
+  </main>
 
   <script>
     const form = document.getElementById("form-busqueda");
-    const lista = document.getElementById("lista-resultados");
-    const mensaje = document.getElementById("mensaje");
+    const feedback = document.getElementById("feedback");
+    const resultados = document.getElementById("resultados");
+    const fechaInput = document.getElementById("fechaSalida");
 
-    const params = new URLSearchParams(window.location.search);
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+    const dd = String(hoy.getDate()).padStart(2, "0");
+    fechaInput.min = `${yyyy}-${mm}-${dd}`;
+    if (!fechaInput.value) fechaInput.value = fechaInput.min;
+
+    const urlParams = new URLSearchParams(window.location.search);
     ["origen", "destino", "fechaSalida", "pasajeros"].forEach((key) => {
-      if (params.get(key)) document.getElementById(key).value = params.get(key);
+      if (urlParams.get(key)) form[key].value = urlParams.get(key);
     });
 
-    if (!document.getElementById("fechaSalida").value) {
-      document.getElementById("fechaSalida").valueAsDate = new Date();
+    function setFeedback(texto, tipo) {
+      feedback.className = tipo || "";
+      feedback.textContent = texto || "";
     }
 
-    if (params.get("origen") && params.get("destino") && params.get("fechaSalida")) {
-      buscar();
+    function validarLocal(origen, destino, fechaSalida, pasajeros) {
+      if (!origen) return "El origen es obligatorio.";
+      if (!destino) return "El destino es obligatorio.";
+      if (origen.toLowerCase() === destino.toLowerCase()) {
+        return "El origen y el destino deben ser diferentes.";
+      }
+      if (!fechaSalida) return "La fecha de salida es obligatoria.";
+      if (fechaSalida < fechaInput.min) {
+        return "La fecha de salida no puede ser anterior a la fecha actual.";
+      }
+      if (!pasajeros || Number(pasajeros) < 1) {
+        return "El número de pasajeros debe ser un entero mayor que cero.";
+      }
+      return null;
     }
 
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const query = new URLSearchParams({
+    function criteriosActuales() {
+      return {
         origen: form.origen.value.trim(),
         destino: form.destino.value.trim(),
         fechaSalida: form.fechaSalida.value,
         pasajeros: form.pasajeros.value
-      });
-      history.replaceState(null, "", `busqueda-vuelos.html?${query.toString()}`);
-      buscar();
-    });
+      };
+    }
 
-    async function buscar() {
-      lista.innerHTML = "";
-      mensaje.hidden = true;
+    function renderVuelos(vuelos) {
+      const criterios = criteriosActuales();
+      resultados.innerHTML = vuelos.map((v) => {
+        const detalle = new URLSearchParams({
+          id: v.id,
+          origen: criterios.origen,
+          destino: criterios.destino,
+          fechaSalida: criterios.fechaSalida,
+          pasajeros: criterios.pasajeros
+        });
+        return `
+        <article>
+          <h2>${v.aerolinea}: ${v.origen} → ${v.destino}</h2>
+          <p>Salida ${v.fechaSalida} ${v.horaSalida || ""} · ${v.duracionMinutos || "—"} min · Escalas: ${v.escalas ?? 0}</p>
+          <p>${v.equipaje || "Equipaje no especificado"} · Cupos: ${v.cuposDisponibles}</p>
+          <div class="acciones">
+            <p class="precio">$${Number(v.precio).toLocaleString("es-CO")}</p>
+            <a class="btn-detalle" href="detalle-vuelo.html?${detalle.toString()}">Ver detalle</a>
+          </div>
+        </article>`;
+      }).join("");
+    }
 
-      const query = new URLSearchParams({
-        origen: form.origen.value.trim(),
-        destino: form.destino.value.trim(),
-        fechaSalida: form.fechaSalida.value,
-        pasajeros: form.pasajeros.value
-      });
+    async function buscarVuelos() {
+      resultados.innerHTML = "";
+      setFeedback("");
+
+      const { origen, destino, fechaSalida, pasajeros } = criteriosActuales();
+
+      const errorLocal = validarLocal(origen, destino, fechaSalida, pasajeros);
+      if (errorLocal) {
+        setFeedback(errorLocal, "error");
+        return;
+      }
+
+      const params = new URLSearchParams({ origen, destino, fechaSalida, pasajeros });
+      history.replaceState(null, "", `busqueda-vuelos.html?${params.toString()}`);
+      setFeedback("Buscando alternativas…", "info");
 
       try {
-        const response = await fetch(`/api/vuelos/buscar?${query.toString()}`);
-        const data = await response.json();
+        const respuesta = await fetch(`./vuelos/buscar?${params.toString()}`);
+        const data = await respuesta.json().catch(() => ({}));
 
-        if (!response.ok) {
-          mensaje.textContent = data.mensaje || data.error || "No se pudo completar la búsqueda.";
-          mensaje.hidden = false;
+        if (!respuesta.ok) {
+          const detalle = data.message || data.error || "Revise los campos e intente de nuevo.";
+          setFeedback(detalle, "error");
           return;
         }
 
-        if (data.mensaje && !Array.isArray(data)) {
-          mensaje.textContent = data.mensaje;
-          mensaje.hidden = false;
+        if (data.mensaje) {
+          setFeedback(data.mensaje, "info");
           return;
         }
 
         if (!Array.isArray(data) || data.length === 0) {
-          mensaje.textContent = "No hay resultados para los criterios indicados.";
-          mensaje.hidden = false;
+          setFeedback("No hay resultados para los criterios indicados. Modifique origen, destino, fecha o pasajeros.", "info");
           return;
         }
 
-        data.forEach((vuelo) => {
-          const li = document.createElement("li");
-          const detalleUrl = new URLSearchParams({
-            id: vuelo.id,
-            origen: form.origen.value.trim(),
-            destino: form.destino.value.trim(),
-            fechaSalida: form.fechaSalida.value,
-            pasajeros: form.pasajeros.value
-          });
-          li.innerHTML = `
-            <article class="flight-item">
-              <div>
-                <h3>${vuelo.aerolinea}</h3>
-                <p>${vuelo.origen} → ${vuelo.destino}</p>
-                <p class="meta">${vuelo.fechaSalida} · ${vuelo.horaSalida?.slice(0, 5) || ""} · ${vuelo.escalas === 0 ? "Directo" : vuelo.escalas + " escala(s)"}</p>
-              </div>
-              <div class="flight-actions">
-                <p class="precio">${formatearPrecio(vuelo.precio)}</p>
-                <a class="btn" href="detalle-vuelo.html?${detalleUrl.toString()}">Ver detalle</a>
-              </div>
-            </article>`;
-          lista.appendChild(li);
-        });
-      } catch (error) {
-        mensaje.textContent = "Error de conexión con la API. Verifica que el servidor esté en ejecución.";
-        mensaje.hidden = false;
+        setFeedback(`${data.length} alternativa${data.length === 1 ? "" : "s"} encontrada${data.length === 1 ? "" : "s"}.`, "info");
+        renderVuelos(data);
+      } catch (err) {
+        setFeedback("No fue posible consultar vuelos. Verifique que la API esté en ejecución.", "error");
       }
     }
 
-    function formatearPrecio(valor) {
-      return new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(valor);
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await buscarVuelos();
+    });
+
+    if (urlParams.get("origen") && urlParams.get("destino") && urlParams.get("fechaSalida")) {
+      buscarVuelos();
     }
   </script>
 </body>
