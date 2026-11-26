@@ -35,6 +35,7 @@ public class BloqueoCupo {
     @Column(name = "fecha_vencimiento", nullable = false)
     private LocalDateTime fechaVencimiento;
 
+    /** Valores canónicos: ACTIVO | VENCIDO */
     @Column(name = "estado", nullable = false, length = 20)
     private String estado;
 }

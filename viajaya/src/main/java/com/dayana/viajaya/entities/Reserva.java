@@ -30,6 +30,7 @@ public class Reserva {
     @Column(name = "valor", nullable = false, precision = 12, scale = 2)
     private BigDecimal valor;
 
+    /** Valores canónicos: PENDIENTE | CONFIRMADA | EXPIRADA */
     @Column(name = "estado", nullable = false, length = 30)
     private String estado;
 

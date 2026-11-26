@@ -102,11 +102,12 @@ INSERT INTO vuelos (
 ('Avianca', 'Medellin', 'Bogota', '2027-06-17', '10:00:00', '2027-06-17', '11:10:00', 70, 195000.00, 0, '1 pieza de mano 10kg', 15, 15),
 ('LATAM', 'Bogota', 'Cali', '2027-06-18', '16:00:00', '2027-06-18', '17:10:00', 70, 175000.00, 1, 'Escala en Pereira; cabina 10kg', 5, 5);
 
+-- Estados de reserva alineados con el código: PENDIENTE | CONFIRMADA | EXPIRADA
 INSERT INTO reservas (fecha_reserva, destino, valor, estado, usuario_id, vuelo_id, cantidad_pasajeros, correo_contacto, telefono_contacto)
 VALUES
-('2026-11-18', 'Cartagena', 850000, 'Confirmada', 1, 3, 1, 'laura@gmail.com', '3001234567'),
-('2026-11-19', 'Medellin', 450000, 'Pendiente', 1, 1, 1, 'laura@gmail.com', '3001234567'),
-('2026-11-20', 'Santa Marta', 1200000, 'Confirmada', 2, NULL, NULL, 'carlos@gmail.com', '3107654321');
+('2026-11-18', 'Cartagena', 850000, 'CONFIRMADA', 1, 3, 1, 'laura@gmail.com', '3001234567'),
+('2026-11-19', 'Medellin', 450000, 'PENDIENTE', 1, 1, 1, 'laura@gmail.com', '3001234567'),
+('2026-11-20', 'Santa Marta', 1200000, 'CONFIRMADA', 2, NULL, NULL, 'carlos@gmail.com', '3107654321');
 
 -- -----------------------------------------------------------------------------
 -- Verificación
