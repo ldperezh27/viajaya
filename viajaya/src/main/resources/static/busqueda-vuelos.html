@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ViajaYa — Buscar vuelos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="viajaya-vuelos.css">
+</head>
+<body>
+  <div class="page">
+    <header class="brand-bar">
+      <a class="brand" href="busqueda-vuelos.html">ViajaYa</a>
+      <p class="brand-tag">Busca y compara tu próximo vuelo</p>
+    </header>
+
+    <main>
+      <section class="panel" aria-labelledby="titulo-busqueda">
+        <h1 id="titulo-busqueda">Buscar vuelos</h1>
+        <form id="form-busqueda" class="search-form">
+          <label>
+            Origen
+            <input id="origen" name="origen" type="text" required placeholder="Bogotá" autocomplete="off">
+          </label>
+          <label>
+            Destino
+            <input id="destino" name="destino" type="text" required placeholder="Medellín" autocomplete="off">
+          </label>
+          <label>
+            Fecha de salida
+            <input id="fechaSalida" name="fechaSalida" type="date" required>
+          </label>
+          <label>
+            Pasajeros
+            <input id="pasajeros" name="pasajeros" type="number" min="1" value="1" required>
+          </label>
+          <button type="submit">Buscar</button>
+        </form>
+      </section>
+
+      <section class="panel results" aria-live="polite">
+        <h2>Resultados</h2>
+        <p id="mensaje" class="mensaje" hidden></p>
+        <ul id="lista-resultados" class="flight-list"></ul>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const form = document.getElementById("form-busqueda");
+    const lista = document.getElementById("lista-resultados");
+    const mensaje = document.getElementById("mensaje");
+
+    const params = new URLSearchParams(window.location.search);
+    ["origen", "destino", "fechaSalida", "pasajeros"].forEach((key) => {
+      if (params.get(key)) document.getElementById(key).value = params.get(key);
+    });
+
+    if (!document.getElementById("fechaSalida").value) {
+      document.getElementById("fechaSalida").valueAsDate = new Date();
+    }
+
+    if (params.get("origen") && params.get("destino") && params.get("fechaSalida")) {
+      buscar();
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const query = new URLSearchParams({
+        origen: form.origen.value.trim(),
+        destino: form.destino.value.trim(),
+        fechaSalida: form.fechaSalida.value,
+        pasajeros: form.pasajeros.value
+      });
+      history.replaceState(null, "", `busqueda-vuelos.html?${query.toString()}`);
+      buscar();
+    });
+
+    async function buscar() {
+      lista.innerHTML = "";
+      mensaje.hidden = true;
+
+      const query = new URLSearchParams({
+        origen: form.origen.value.trim(),
+        destino: form.destino.value.trim(),
+        fechaSalida: form.fechaSalida.value,
+        pasajeros: form.pasajeros.value
+      });
+
+      try {
+        const response = await fetch(`/api/vuelos/buscar?${query.toString()}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          mensaje.textContent = data.mensaje || data.error || "No se pudo completar la búsqueda.";
+          mensaje.hidden = false;
+          return;
+        }
+
+        if (data.mensaje && !Array.isArray(data)) {
+          mensaje.textContent = data.mensaje;
+          mensaje.hidden = false;
+          return;
+        }
+
+        if (!Array.isArray(data) || data.length === 0) {
+          mensaje.textContent = "No hay resultados para los criterios indicados.";
+          mensaje.hidden = false;
+          return;
+        }
+
+        data.forEach((vuelo) => {
+          const li = document.createElement("li");
+          const detalleUrl = new URLSearchParams({
+            id: vuelo.id,
+            origen: form.origen.value.trim(),
+            destino: form.destino.value.trim(),
+            fechaSalida: form.fechaSalida.value,
+            pasajeros: form.pasajeros.value
+          });
+          li.innerHTML = `
+            <article class="flight-item">
+              <div>
+                <h3>${vuelo.aerolinea}</h3>
+                <p>${vuelo.origen} → ${vuelo.destino}</p>
+                <p class="meta">${vuelo.fechaSalida} · ${vuelo.horaSalida?.slice(0, 5) || ""} · ${vuelo.escalas === 0 ? "Directo" : vuelo.escalas + " escala(s)"}</p>
+              </div>
+              <div class="flight-actions">
+                <p class="precio">${formatearPrecio(vuelo.precio)}</p>
+                <a class="btn" href="detalle-vuelo.html?${detalleUrl.toString()}">Ver detalle</a>
+              </div>
+            </article>`;
+          lista.appendChild(li);
+        });
+      } catch (error) {
+        mensaje.textContent = "Error de conexión con la API. Verifica que el servidor esté en ejecución.";
+        mensaje.hidden = false;
+      }
+    }
+
+    function formatearPrecio(valor) {
+      return new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(valor);
+    }
+  </script>
+</body>
+</html>

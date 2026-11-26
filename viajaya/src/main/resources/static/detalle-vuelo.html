@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ViajaYa — Detalle de vuelo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="viajaya-vuelos.css">
+</head>
+<body>
+  <div class="page">
+    <header class="brand-bar">
+      <a class="brand" href="busqueda-vuelos.html">ViajaYa</a>
+      <p class="brand-tag">Detalle del itinerario</p>
+    </header>
+
+    <main>
+      <p id="mensaje" class="mensaje" hidden></p>
+
+      <section id="detalle" class="panel detail" hidden>
+        <div class="detail-header">
+          <div>
+            <p class="eyebrow" id="aerolinea"></p>
+            <h1 id="ruta"></h1>
+          </div>
+          <a id="volver" class="btn btn-secondary" href="busqueda-vuelos.html">Volver a resultados</a>
+        </div>
+
+        <section aria-labelledby="titulo-itinerario">
+          <h2 id="titulo-itinerario">Itinerario</h2>
+          <dl class="grid-dl">
+            <div><dt>Salida</dt><dd id="salida"></dd></div>
+            <div><dt>Llegada</dt><dd id="llegada"></dd></div>
+            <div><dt>Duración</dt><dd id="duracion"></dd></div>
+            <div><dt>Cupos disponibles</dt><dd id="cupos"></dd></div>
+          </dl>
+        </section>
+
+        <section aria-labelledby="titulo-escalas">
+          <h2 id="titulo-escalas">Escalas y equipaje</h2>
+          <dl class="grid-dl">
+            <div><dt>Escalas</dt><dd id="escalas"></dd></div>
+            <div><dt>Equipaje</dt><dd id="equipaje"></dd></div>
+          </dl>
+        </section>
+
+        <section aria-labelledby="titulo-tarifas">
+          <h2 id="titulo-tarifas">Tarifas</h2>
+          <dl class="grid-dl tarifas">
+            <div><dt>Precio del vuelo</dt><dd id="precio"></dd></div>
+            <div><dt>Impuestos</dt><dd id="impuestos">Sin desglose disponible en el modelo actual</dd></div>
+            <div class="total"><dt>Total estimado</dt><dd id="total"></dd></div>
+          </dl>
+          <p class="nota">El total corresponde al precio publicado del vuelo. No hay campo de impuestos en la base de datos.</p>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const mensaje = document.getElementById("mensaje");
+    const detalle = document.getElementById("detalle");
+    const volver = document.getElementById("volver");
+
+    const criterios = new URLSearchParams();
+    ["origen", "destino", "fechaSalida", "pasajeros"].forEach((key) => {
+      if (params.get(key)) criterios.set(key, params.get(key));
+    });
+    volver.href = criterios.toString()
+      ? `busqueda-vuelos.html?${criterios.toString()}`
+      : "busqueda-vuelos.html";
+
+    if (!id) {
+      mostrarError("Falta el identificador del vuelo.");
+    } else {
+      cargarDetalle(id);
+    }
+
+    async function cargarDetalle(vueloId) {
+      try {
+        const response = await fetch(`/api/vuelos/${vueloId}`);
+        if (response.status === 404) {
+          mostrarError("El vuelo solicitado no existe.");
+          return;
+        }
+        if (!response.ok) {
+          mostrarError("No se pudo cargar el detalle del vuelo.");
+          return;
+        }
+
+        const vuelo = await response.json();
+        document.getElementById("aerolinea").textContent = vuelo.aerolinea;
+        document.getElementById("ruta").textContent = `${vuelo.origen} → ${vuelo.destino}`;
+        document.getElementById("salida").textContent = formatearFechaHora(vuelo.fechaSalida, vuelo.horaSalida);
+        document.getElementById("llegada").textContent = formatearFechaHora(vuelo.fechaLlegada, vuelo.horaLlegada);
+        document.getElementById("duracion").textContent = vuelo.duracionMinutos != null
+          ? `${vuelo.duracionMinutos} minutos`
+          : "No informada";
+        document.getElementById("cupos").textContent = `${vuelo.cuposDisponibles} de ${vuelo.cuposTotales}`;
+        document.getElementById("escalas").textContent = vuelo.escalas === 0
+          ? "Vuelo directo"
+          : `${vuelo.escalas} escala(s)`;
+        document.getElementById("equipaje").textContent = vuelo.equipaje || "No informado";
+        document.getElementById("precio").textContent = formatearPrecio(vuelo.precio);
+        document.getElementById("total").textContent = formatearPrecio(vuelo.precio);
+        detalle.hidden = false;
+      } catch (error) {
+        mostrarError("Error de conexión con la API. Verifica que el servidor esté en ejecución.");
+      }
+    }
+
+    function mostrarError(texto) {
+      mensaje.textContent = texto;
+      mensaje.hidden = false;
+      detalle.hidden = true;
+    }
+
+    function formatearFechaHora(fecha, hora) {
+      if (!fecha) return "No informada";
+      const horaCorta = hora ? hora.slice(0, 5) : "";
+      return horaCorta ? `${fecha} ${horaCorta}` : fecha;
+    }
+
+    function formatearPrecio(valor) {
+      return new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(valor);
+    }
+  </script>
+</body>
+</html>
