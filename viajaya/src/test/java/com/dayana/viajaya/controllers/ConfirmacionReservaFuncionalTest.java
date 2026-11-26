@@ -69,7 +69,7 @@ class ConfirmacionReservaFuncionalTest {
             assertThat(resultado).bodyJson().extractingPath("$.servicio").isEqualTo("Reserva de viaje");
             assertThat(resultado).bodyJson().extractingPath("$.destino").isEqualTo("Cartagena");
             assertThat(resultado).bodyJson().extractingPath("$.fechaReserva").isEqualTo("2026-11-18");
-            assertThat(resultado).bodyJson().extractingPath("$.estado").isEqualTo("Confirmada");
+            assertThat(resultado).bodyJson().extractingPath("$.estado").isEqualTo("CONFIRMADA");
             assertThat(resultado).bodyJson().extractingPath("$.titular.nombre").isEqualTo("Laura");
             assertThat(resultado).bodyJson().extractingPath("$.titular.apellido").isEqualTo("Gomez");
         }
