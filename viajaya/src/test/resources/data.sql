@@ -19,7 +19,8 @@ INSERT INTO vuelos (
 (4, 'Avianca', 'Medellin', 'Bogota', '2027-06-17', '10:00:00',
  '2027-06-17', '11:10:00', 70, 195000.00, 0, '1 pieza de mano 10kg', 15, 15);
 
+-- Estados de reserva alineados con el código: PENDIENTE | CONFIRMADA | EXPIRADA
 INSERT INTO reservas (id, fecha_reserva, destino, valor, estado, usuario_id) VALUES
-(1, '2026-11-18', 'Cartagena', 850000.00, 'Confirmada', 1),
-(2, '2026-11-19', 'Medellin', 450000.00, 'Pendiente', 1),
-(3, '2026-11-20', 'Santa Marta', 1200000.00, 'Confirmada', 2);
+(1, '2026-11-18', 'Cartagena', 850000.00, 'CONFIRMADA', 1),
+(2, '2026-11-19', 'Medellin', 450000.00, 'PENDIENTE', 1),
+(3, '2026-11-20', 'Santa Marta', 1200000.00, 'CONFIRMADA', 2);
