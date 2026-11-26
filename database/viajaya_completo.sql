@@ -96,11 +96,11 @@ INSERT INTO vuelos (
     aerolinea, origen, destino, fecha_salida, hora_salida,
     fecha_llegada, hora_llegada, duracion_minutos, precio, escalas, equipaje, cupos_disponibles, cupos_totales
 ) VALUES
-('Avianca', 'Bogota', 'Medellin', '2026-11-25', '08:00:00', '2026-11-25', '09:05:00', 65, 189000.00, 0, '1 pieza de mano 10kg', 12, 12),
-('LATAM', 'Bogota', 'Medellin', '2026-11-25', '14:30:00', '2026-11-25', '15:40:00', 70, 215000.00, 0, 'Cabina + bodega 23kg', 8, 8),
-('Wingo', 'Bogota', 'Cartagena', '2026-11-26', '06:15:00', '2026-11-26', '07:45:00', 90, 159000.00, 0, '1 pieza de mano 10kg', 20, 20),
-('Avianca', 'Medellin', 'Bogota', '2026-11-27', '10:00:00', '2026-11-27', '11:10:00', 70, 195000.00, 0, '1 pieza de mano 10kg', 15, 15),
-('LATAM', 'Bogota', 'Cali', '2026-11-28', '16:00:00', '2026-11-28', '17:10:00', 70, 175000.00, 1, 'Escala en Pereira; cabina 10kg', 5, 5);
+('Avianca', 'Bogota', 'Medellin', '2027-06-15', '08:00:00', '2027-06-15', '09:05:00', 65, 189000.00, 0, '1 pieza de mano 10kg', 12, 12),
+('LATAM', 'Bogota', 'Medellin', '2027-06-15', '14:30:00', '2027-06-15', '15:40:00', 70, 215000.00, 0, 'Cabina + bodega 23kg', 8, 8),
+('Wingo', 'Bogota', 'Cartagena', '2027-06-16', '06:15:00', '2027-06-16', '07:45:00', 90, 159000.00, 0, '1 pieza de mano 10kg', 20, 20),
+('Avianca', 'Medellin', 'Bogota', '2027-06-17', '10:00:00', '2027-06-17', '11:10:00', 70, 195000.00, 0, '1 pieza de mano 10kg', 15, 15),
+('LATAM', 'Bogota', 'Cali', '2027-06-18', '16:00:00', '2027-06-18', '17:10:00', 70, 175000.00, 1, 'Escala en Pereira; cabina 10kg', 5, 5);
 
 INSERT INTO reservas (fecha_reserva, destino, valor, estado, usuario_id, vuelo_id, cantidad_pasajeros, correo_contacto, telefono_contacto)
 VALUES

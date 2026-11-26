@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ViajaYa — Buscar vuelos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #14231a;
+      --muted: #3d5346;
+      --paper: #f3efe6;
+      --panel: rgba(255, 252, 246, 0.92);
+      --accent: #0f6b4c;
+      --accent-deep: #0a4a35;
+      --line: rgba(20, 35, 26, 0.14);
+      --danger: #8a2a1b;
+      --shadow: 0 18px 50px rgba(20, 35, 26, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Source Sans 3", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #d8efe4 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #f0e0c8 0%, transparent 50%),
+        linear-gradient(160deg, #efe8da 0%, #e7f0ea 45%, #dfe9e3 100%);
+    }
+
+    main {
+      width: min(920px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 3.5rem 0 4rem;
+    }
+
+    .brand {
+      font-family: Fraunces, serif;
+      font-size: clamp(2.4rem, 6vw, 3.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin: 0 0 0.35rem;
+      animation: rise 700ms ease both;
+    }
+
+    .lede {
+      margin: 0 0 2rem;
+      max-width: 34rem;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.45;
+      animation: rise 700ms ease 80ms both;
+    }
+
+    form {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 1.35rem;
+      display: grid;
+      gap: 0.9rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      animation: rise 700ms ease 140ms both;
+    }
+
+    label {
+      display: grid;
+      gap: 0.35rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    label.full { grid-column: 1 / -1; }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      padding: 0.75rem 0.85rem;
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 107, 76, 0.16);
+    }
+
+    .actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 0.25rem;
+    }
+
+    button {
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      padding: 0.8rem 1.25rem;
+      cursor: pointer;
+      transition: transform 160ms ease, background 160ms ease;
+    }
+
+    button:hover { background: var(--accent-deep); }
+    button:active { transform: translateY(1px); }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    #feedback {
+      margin-top: 1.25rem;
+      min-height: 1.5rem;
+      font-size: 0.98rem;
+      animation: rise 500ms ease both;
+    }
+
+    #feedback.error { color: var(--danger); font-weight: 600; }
+    #feedback.info { color: var(--muted); }
+
+    #resultados {
+      margin-top: 1rem;
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    article {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 1rem 1.1rem;
+      display: grid;
+      gap: 0.35rem;
+      animation: rise 500ms ease both;
+    }
+
+    article h2 {
+      margin: 0;
+      font-family: Fraunces, serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    article p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    article .precio {
+      color: var(--accent-deep);
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    @media (max-width: 700px) {
+      form { grid-template-columns: 1fr; }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="brand">ViajaYa</p>
+    <p class="lede">Busca vuelos por origen, destino, fecha de salida y pasajeros.</p>
+
+    <form id="form-busqueda" novalidate>
+      <label>
+        Origen
+        <input id="origen" name="origen" type="text" required placeholder="Bogota" autocomplete="off" />
+      </label>
+      <label>
+        Destino
+        <input id="destino" name="destino" type="text" required placeholder="Medellin" autocomplete="off" />
+      </label>
+      <label>
+        Fecha de salida
+        <input id="fechaSalida" name="fechaSalida" type="date" required />
+      </label>
+      <label>
+        Pasajeros
+        <input id="pasajeros" name="pasajeros" type="number" min="1" step="1" value="1" required />
+      </label>
+      <div class="actions">
+        <button type="submit">Buscar vuelos</button>
+        <span class="hint">PVY-9 · consulta contra /api/vuelos/buscar</span>
+      </div>
+    </form>
+
+    <div id="feedback" aria-live="polite"></div>
+    <section id="resultados" aria-live="polite"></section>
+  </main>
+
+  <script>
+    const form = document.getElementById("form-busqueda");
+    const feedback = document.getElementById("feedback");
+    const resultados = document.getElementById("resultados");
+    const fechaInput = document.getElementById("fechaSalida");
+
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+    const dd = String(hoy.getDate()).padStart(2, "0");
+    fechaInput.min = `${yyyy}-${mm}-${dd}`;
+    if (!fechaInput.value) fechaInput.value = fechaInput.min;
+
+    function setFeedback(texto, tipo) {
+      feedback.className = tipo || "";
+      feedback.textContent = texto || "";
+    }
+
+    function validarLocal(origen, destino, fechaSalida, pasajeros) {
+      if (!origen) return "El origen es obligatorio.";
+      if (!destino) return "El destino es obligatorio.";
+      if (origen.toLowerCase() === destino.toLowerCase()) {
+        return "El origen y el destino deben ser diferentes.";
+      }
+      if (!fechaSalida) return "La fecha de salida es obligatoria.";
+      if (fechaSalida < fechaInput.min) {
+        return "La fecha de salida no puede ser anterior a la fecha actual.";
+      }
+      if (!pasajeros || Number(pasajeros) < 1) {
+        return "El número de pasajeros debe ser un entero mayor que cero.";
+      }
+      return null;
+    }
+
+    function renderVuelos(vuelos) {
+      resultados.innerHTML = vuelos.map((v) => `
+        <article>
+          <h2>${v.aerolinea}: ${v.origen} → ${v.destino}</h2>
+          <p>Salida ${v.fechaSalida} ${v.horaSalida || ""} · ${v.duracionMinutos || "—"} min · Escalas: ${v.escalas ?? 0}</p>
+          <p>${v.equipaje || "Equipaje no especificado"} · Cupos: ${v.cuposDisponibles}</p>
+          <p class="precio">$${Number(v.precio).toLocaleString("es-CO")}</p>
+        </article>
+      `).join("");
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      resultados.innerHTML = "";
+      setFeedback("");
+
+      const origen = form.origen.value.trim();
+      const destino = form.destino.value.trim();
+      const fechaSalida = form.fechaSalida.value;
+      const pasajeros = form.pasajeros.value;
+
+      const errorLocal = validarLocal(origen, destino, fechaSalida, pasajeros);
+      if (errorLocal) {
+        setFeedback(errorLocal, "error");
+        return;
+      }
+
+      const params = new URLSearchParams({ origen, destino, fechaSalida, pasajeros });
+      setFeedback("Buscando alternativas…", "info");
+
+      try {
+        const respuesta = await fetch(`./vuelos/buscar?${params.toString()}`);
+        const data = await respuesta.json().catch(() => ({}));
+
+        if (!respuesta.ok) {
+          const detalle = data.message || data.error || "Revise los campos e intente de nuevo.";
+          setFeedback(detalle, "error");
+          return;
+        }
+
+        if (data.mensaje) {
+          setFeedback(data.mensaje, "info");
+          return;
+        }
+
+        if (!Array.isArray(data) || data.length === 0) {
+          setFeedback("No hay resultados para los criterios indicados. Modifique origen, destino, fecha o pasajeros.", "info");
+          return;
+        }
+
+        setFeedback(`${data.length} alternativa${data.length === 1 ? "" : "s"} encontrada${data.length === 1 ? "" : "s"}.`, "info");
+        renderVuelos(data);
+      } catch (err) {
+        setFeedback("No fue posible consultar vuelos. Verifique que la API esté en ejecución.", "error");
+      }
+    });
+  </script>
+</body>
+</html>
