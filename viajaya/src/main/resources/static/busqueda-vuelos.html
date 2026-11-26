@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -165,6 +165,31 @@
       font-size: 1.05rem;
     }
 
+    article .acciones {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    article .btn-detalle {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border: 1px solid rgba(15, 107, 76, 0.35);
+      color: var(--accent-deep);
+      background: transparent;
+      font: inherit;
+      font-weight: 600;
+      padding: 0.55rem 0.95rem;
+    }
+
+    article .btn-detalle:hover {
+      background: rgba(15, 107, 76, 0.08);
+    }
+
     @media (max-width: 700px) {
       form { grid-template-columns: 1fr; }
     }
@@ -220,6 +245,11 @@
     fechaInput.min = `${yyyy}-${mm}-${dd}`;
     if (!fechaInput.value) fechaInput.value = fechaInput.min;
 
+    const urlParams = new URLSearchParams(window.location.search);
+    ["origen", "destino", "fechaSalida", "pasajeros"].forEach((key) => {
+      if (urlParams.get(key)) form[key].value = urlParams.get(key);
+    });
+
     function setFeedback(texto, tipo) {
       feedback.className = tipo || "";
       feedback.textContent = texto || "";
@@ -241,26 +271,43 @@
       return null;
     }
 
+    function criteriosActuales() {
+      return {
+        origen: form.origen.value.trim(),
+        destino: form.destino.value.trim(),
+        fechaSalida: form.fechaSalida.value,
+        pasajeros: form.pasajeros.value
+      };
+    }
+
     function renderVuelos(vuelos) {
-      resultados.innerHTML = vuelos.map((v) => `
+      const criterios = criteriosActuales();
+      resultados.innerHTML = vuelos.map((v) => {
+        const detalle = new URLSearchParams({
+          id: v.id,
+          origen: criterios.origen,
+          destino: criterios.destino,
+          fechaSalida: criterios.fechaSalida,
+          pasajeros: criterios.pasajeros
+        });
+        return `
         <article>
           <h2>${v.aerolinea}: ${v.origen} → ${v.destino}</h2>
           <p>Salida ${v.fechaSalida} ${v.horaSalida || ""} · ${v.duracionMinutos || "—"} min · Escalas: ${v.escalas ?? 0}</p>
           <p>${v.equipaje || "Equipaje no especificado"} · Cupos: ${v.cuposDisponibles}</p>
-          <p class="precio">$${Number(v.precio).toLocaleString("es-CO")}</p>
-        </article>
-      `).join("");
+          <div class="acciones">
+            <p class="precio">$${Number(v.precio).toLocaleString("es-CO")}</p>
+            <a class="btn-detalle" href="detalle-vuelo.html?${detalle.toString()}">Ver detalle</a>
+          </div>
+        </article>`;
+      }).join("");
     }
 
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
+    async function buscarVuelos() {
       resultados.innerHTML = "";
       setFeedback("");
 
-      const origen = form.origen.value.trim();
-      const destino = form.destino.value.trim();
-      const fechaSalida = form.fechaSalida.value;
-      const pasajeros = form.pasajeros.value;
+      const { origen, destino, fechaSalida, pasajeros } = criteriosActuales();
 
       const errorLocal = validarLocal(origen, destino, fechaSalida, pasajeros);
       if (errorLocal) {
@@ -269,6 +316,7 @@
       }
 
       const params = new URLSearchParams({ origen, destino, fechaSalida, pasajeros });
+      history.replaceState(null, "", `busqueda-vuelos.html?${params.toString()}`);
       setFeedback("Buscando alternativas…", "info");
 
       try {
@@ -296,7 +344,16 @@
       } catch (err) {
         setFeedback("No fue posible consultar vuelos. Verifique que la API esté en ejecución.", "error");
       }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await buscarVuelos();
     });
+
+    if (urlParams.get("origen") && urlParams.get("destino") && urlParams.get("fechaSalida")) {
+      buscarVuelos();
+    }
   </script>
 </body>
 </html>
